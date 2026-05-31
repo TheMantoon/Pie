@@ -1,0 +1,5 @@
+-keep class com.WhireDeveloper.PiePlayer.** { *; }
+-keepclassmembers class com.WhireDeveloper.** {
+  public java.lang.String getId();
+  public java.lang.String getIdToken();
+}
