@@ -8,7 +8,7 @@ I will be glad to any help in developing the project!
 ## BASS
 **Eclair** uses the BASS audio library for audio playback.
 > BASS Audio Library (https://www.un4seen.com)<br>
-> Copyright (c) 1999-2023 Un4seen Developments Ltd.
+> Copyright © 2003-2026 Un4seen Developments Ltd.
 
 > BASS is used under the license granted by Un4seen Developments.<br>
 > For more information, visit https://www.un4seen.com.
@@ -45,4 +45,4 @@ I like developing this project and I do not think that this player should be pai
 * [StandaloneFileBrowser](https://github.com/gkngkc/UnityStandaloneFileBrowser)
 
 # [License](LICENSE)
-**Eclair** is licensed under the [MIT](https://choosealicense.com/licenses/mit). Please review the [LICENSE](LICENSE) file.
+**Pie** is licensed under the [MIT](https://choosealicense.com/licenses/mit). Please review the [LICENSE](LICENSE) file.
