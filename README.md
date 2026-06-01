@@ -29,6 +29,8 @@ I like developing this project and I do not think that this player should be pai
 | `.flac`| *Free Lossless Audio Codec* |
 | `.aiff / .aif`| *Audio Interchange File Format* |
 | `.wav`| *Waveform Audio File Format* |
+| `.wma`| *Windows Media Audio* |
+| `.mod`| *Music Module File* |
 
 ## Supported OS
 | System | Minimum Version |
