@@ -9,10 +9,13 @@
   <Project Path="Unity.VisualStudio.Editor.csproj" />
   <Project Path="Unity.TextMeshPro.csproj" />
   <Project Path="Unity.TextMeshPro.Editor.csproj" />
+  <Project Path="NativeCursor.Runtime.csproj" />
   <Project Path="NativeFilePicker.Editor.csproj" />
   <Project Path="Unity.InternalAPIEngineBridge.004.csproj" />
   <Project Path="NativeFilePicker.Runtime.csproj" />
   <Project Path="Unity.SysrootPackage.Editor.csproj" />
+  <Project Path="NativeCursor.Editor.csproj" />
+  <Project Path="NativeCursor.GUI.Editor.csproj" />
   <Project Path="Unity.Toolchain.Win-x86_64-Linux.csproj" />
   <Project Path="Unity.Sysroot.Linux_x86_64.csproj" />
 </Solution>

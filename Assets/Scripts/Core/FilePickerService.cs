@@ -22,7 +22,7 @@ namespace Pie.Core
 #if UNITY_STANDALONE || UNITY_EDITOR
             var paths = SFB.StandaloneFileBrowser.OpenFilePanel(
                 "Select Audio", "", new[] { new SFB.ExtensionFilter("Audio", "mp3", "mp2", "mp1", "ogg", "flac", "aif", "aiff", "wav", 
-                "it", "xm", "s3m", "mod") }, false);
+                "wma", "mod") }, false);
             onComplete?.Invoke(paths.Length > 0 ? paths[0] : null);
 #elif !UNITY_STANDALONE && !UNITY_EDITOR
             NativeFilePicker.PickFile((path) =>
