@@ -4,10 +4,10 @@ apply from: '../shared/keepUnitySymbols.gradle'
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'androidx.core:core:1.12.0'
-    implementation "androidx.media3:media3-exoplayer:1.8.0"
-    implementation "androidx.media3:media3-session:1.8.0"
-    implementation "androidx.media3:media3-ui:1.8.0"
+    implementation 'androidx.core:core:1.18.0'
+    implementation "androidx.media3:media3-exoplayer:1.10.1"
+    implementation "androidx.media3:media3-session:1.10.1"
+    implementation "androidx.media3:media3-ui:1.10.1"
 **DEPS**
 }
 
