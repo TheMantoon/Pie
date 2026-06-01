@@ -45,6 +45,8 @@ I like developing this project and I do not think that this player should be pai
 * [TagLibSharp](https://github.com/mono/taglib-sharp)
 * [NativeFilePicker](https://github.com/yasirkula/UnityNativeFilePicker)
 * [StandaloneFileBrowser](https://github.com/gkngkc/UnityStandaloneFileBrowser)
+* [UI Rounded Corners](https://github.com/kirevdokimov/Unity-UI-Rounded-Corners)
+* [Native Cursor](https://assetstore.unity.com/packages/tools/utilities/native-cursor-220347)
 
 # [License](LICENSE)
 **Pie** is licensed under the [MIT](https://choosealicense.com/licenses/mit). Please review the [LICENSE](LICENSE) file.
