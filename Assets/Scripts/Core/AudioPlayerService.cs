@@ -16,7 +16,7 @@ namespace Pie.Core
 #if UNITY_ANDROID && !UNITY_EDITOR
             backend = new AndroidExoBackend();
 #elif UNITY_STANDALONE || UNITY_EDITOR
-            backend = new UnityAudioBackend();
+            backend = new ManagedBassBackend();
 #endif
         }
 

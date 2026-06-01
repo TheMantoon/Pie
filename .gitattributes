@@ -128,6 +128,7 @@ Packages/packages-lock.json linguist-generated
 *.jpeg                  lfs
 *.jpg                   lfs
 *.pict                  lfs
+*.png                   lfs
 *.psd                   lfs
 *.tga                   lfs
 *.tif                   lfs
@@ -143,7 +144,9 @@ Packages/packages-lock.json linguist-generated
 *.zip                   lfs
 
 # Compiled Dynamic Library
+*.dll                   lfs
 *.pdb                   lfs
+*.so                    lfs
 
 # Fonts
 *.otf                   lfs

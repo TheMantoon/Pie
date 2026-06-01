@@ -28,7 +28,7 @@ namespace Pie.UI
         private void Update()
         {
             timer += Time.deltaTime;
-            if (AudioPlayerService.Instance.GetState() && timer >= 0.2f && !isDragging)
+            if (timer >= 0.2f && !isDragging)
             {
                 float progress = AudioPlayerService.Instance.GetPlaybackPosition();
                 positionSlider.value = progress;
@@ -66,6 +66,7 @@ namespace Pie.UI
             AudioPlayerService.Instance.Stop();
             positionSlider.value = 0f;
             positionSlider.interactable = false;
+            timeText.text = "00:00/00:00";
         }
 
         public void BeginDrag() => isDragging = true;
