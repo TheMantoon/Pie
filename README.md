@@ -33,7 +33,7 @@ I like developing this project and I do not think that this player should be pai
 ## Supported OS
 | System | Minimum Version |
 | :------- | :----------------: |
-| Windows | 10 21H1 |
+| Windows | 10 |
 | Ubuntu | 22.04 |
 | Android | 7.1 |
 
