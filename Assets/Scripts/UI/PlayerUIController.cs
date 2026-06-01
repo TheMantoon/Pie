@@ -6,24 +6,14 @@ namespace Pie.UI
 {
     public class PlayerUIController : MonoBehaviour
     {
-        public Text titleText;
-        public Text timeText;
-        public Text volumeText;
-        public Image coverImage;
-        public Sprite placeholderCover;
-        public Slider volumeSlider;
+        public Text titleText, timeText, volumeText;
+        public Image coverImage, playImage;
+        public Sprite placeholderCover, resumeSprite, pauseSprite;
         public Slider positionSlider;
-        public Toggle loopToggle;
         private bool isDragging;
         private float timer = 0.0f;
 
-        private void Start()
-        {
-            volumeSlider.onValueChanged.AddListener(OnVolumeChanged);
-            loopToggle.onValueChanged.AddListener(OnLoopChanged);
-            volumeSlider.SetValueWithoutNotify(1f);
-            UpdateVolumeText(1f);
-        }
+        private void Start() => UpdateVolumeText(1f);
 
         private void Update()
         {
@@ -34,6 +24,8 @@ namespace Pie.UI
                 positionSlider.value = progress;
                 UpdateTimeText(progress);
                 timer = 0.0f;
+                if (AudioPlayerService.Instance.GetState()) playImage.sprite = pauseSprite;
+                else playImage.sprite = resumeSprite;
             }
         }
 
@@ -48,6 +40,7 @@ namespace Pie.UI
                 AudioPlayerService.Instance.Play();
                 positionSlider.value = 0f;
                 positionSlider.interactable = true;
+                playImage.sprite = pauseSprite;
             });
         }
 
@@ -56,9 +49,16 @@ namespace Pie.UI
             AudioPlayerService.Instance.Play();
             positionSlider.value = 0f;
             positionSlider.interactable = true;
+            playImage.sprite = pauseSprite;
         }
-        public void Pause() => AudioPlayerService.Instance.Pause(true);
-        public void Resume() => AudioPlayerService.Instance.Pause(false);
+
+        public void Pause()
+        {
+            if (!AudioPlayerService.Instance.GetState()) playImage.sprite = pauseSprite;
+            else playImage.sprite = resumeSprite;
+            AudioPlayerService.Instance.Pause();
+        }
+
         public void Stop()
         {
             titleText.text = "Select audio";
@@ -67,6 +67,7 @@ namespace Pie.UI
             positionSlider.value = 0f;
             positionSlider.interactable = false;
             timeText.text = "00:00/00:00";
+            playImage.sprite = resumeSprite;
         }
 
         public void BeginDrag() => isDragging = true;
@@ -77,13 +78,13 @@ namespace Pie.UI
             AudioPlayerService.Instance.Seek(positionSlider.value);
         }
 
-        private void OnVolumeChanged(float value)
+        public void OnVolumeChanged(float value)
         {
             AudioPlayerService.Instance.SetVolume(value);
             UpdateVolumeText(value);
         }
 
-        private void OnLoopChanged(bool value) => AudioPlayerService.Instance.SetLoop(value);
+        public void OnLoopChanged(bool value) => AudioPlayerService.Instance.SetLoop(value);
 
         private void UpdateVolumeText(float value)
         {

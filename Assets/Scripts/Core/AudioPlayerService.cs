@@ -22,7 +22,7 @@ namespace Pie.Core
 
         public void Load(string path) => backend.Load(path);
         public void Play() => backend.Play();
-        public void Pause(bool p) => backend.Pause(p);
+        public void Pause() => backend.Pause(GetState());
         public void Stop() => backend.Stop();
 
         public void SetVolume(float v)

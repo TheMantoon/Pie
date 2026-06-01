@@ -32,7 +32,10 @@
 		<service
             android:name="com.WhireDeveloper.PiePlayer.MusicService"
 			android:foregroundServiceType="mediaPlayback"
-            android:enabled="true"
-            android:exported="false" />
+            android:exported="false">
+		    <intent-filter>
+                <action android:name="androidx.media3.session.MediaSessionService"/>
+            </intent-filter>
+	    </service>
 	</application>
 </manifest>
