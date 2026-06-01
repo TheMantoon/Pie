@@ -14,7 +14,7 @@ I will be glad to any help in developing the project!
 > For more information, visit https://www.un4seen.com.
 
 ## Why is Pie open-source?
-**Pie** is my experimental.
+**Pie** is my experimental project.
 I support free software, and that is why **Pie** is open-source.
 I want to share my project source code.
 I like developing this project and I do not think that this player should be paid and with closed source code.
