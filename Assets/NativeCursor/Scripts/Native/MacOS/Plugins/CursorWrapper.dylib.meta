@@ -1,8 +1,15 @@
 fileFormatVersion: 2
 guid: 0c8b7bd8df7d759488e4374fb3dc6863
+AssetOrigin:
+  serializedVersion: 1
+  productId: 220347
+  packageName: Native Cursor
+  packageVersion: 1.1.3
+  assetPath: Assets/NativeCursor/Scripts/Native/MacOS/Plugins/CursorWrapper.dylib
+  uploadId: 718824
 PluginImporter:
   externalObjects: {}
-  serializedVersion: 2
+  serializedVersion: 3
   iconMap: {}
   executionOrder: {}
   defineConstraints: []
@@ -11,60 +18,51 @@ PluginImporter:
   isExplicitlyReferenced: 0
   validateReferences: 1
   platformData:
-  - first:
-      : Any
-    second:
+    Android:
       enabled: 0
       settings:
-        Exclude Editor: 1
+        AndroidLibraryDependee: UnityLibrary
+        AndroidSharedLibraryType: Executable
+        CPU: ARMv7
+    Any:
+      enabled: 0
+      settings:
+        Exclude Android: 1
+        Exclude Editor: 0
         Exclude Linux64: 1
         Exclude OSXUniversal: 0
         Exclude Win: 1
         Exclude Win64: 1
-  - first:
-      Any: 
-    second:
-      enabled: 0
-      settings: {}
-  - first:
-      Editor: Editor
-    second:
-      enabled: 0
+        Exclude iOS: 1
+    Editor:
+      enabled: 1
       settings:
         CPU: AnyCPU
         DefaultValueInitialized: true
         OS: AnyOS
-  - first:
-      Standalone: Linux64
-    second:
+    Linux64:
       enabled: 0
       settings:
         CPU: AnyCPU
-  - first:
-      Standalone: OSXUniversal
-    second:
+    OSXUniversal:
       enabled: 1
       settings:
         CPU: AnyCPU
-  - first:
-      Standalone: Win
-    second:
+    Win:
       enabled: 0
       settings:
         CPU: AnyCPU
-  - first:
-      Standalone: Win64
-    second:
+    Win64:
       enabled: 0
       settings:
         CPU: AnyCPU
+    iOS:
+      enabled: 0
+      settings:
+        AddToEmbeddedBinaries: false
+        CPU: AnyCPU
+        CompileFlags: 
+        FrameworkDependencies: 
   userData: 
   assetBundleName: 
   assetBundleVariant: 
-AssetOrigin:
-  serializedVersion: 1
-  productId: 220347
-  packageName: Native Cursor
-  packageVersion: 1.1.3
-  assetPath: Assets/NativeCursor/Scripts/Native/MacOS/Plugins/CursorWrapper.dylib
-  uploadId: 718824
