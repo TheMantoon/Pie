@@ -6,7 +6,7 @@ namespace Pie.UI
 {
     public class PlayerUIController : MonoBehaviour
     {
-        public Text titleText, timeText, volumeText;
+        public Text titleText, performersText, timeText, volumeText;
         public Image coverImage, playImage;
         public Sprite placeholderCover, resumeSprite, pauseSprite;
         public Slider positionSlider;
@@ -35,6 +35,7 @@ namespace Pie.UI
             {
                 if (string.IsNullOrEmpty(path)) return;
                 titleText.text = AudioMetadataService.GetTitle(path);
+                performersText.text = AudioMetadataService.GetPerformers(path);
                 coverImage.sprite = AudioMetadataService.GetCover(path, placeholderCover);
                 AudioPlayerService.Instance.Load(path);
                 AudioPlayerService.Instance.Play();
@@ -62,6 +63,7 @@ namespace Pie.UI
         public void Stop()
         {
             titleText.text = "Select audio";
+            performersText.text = string.Empty;
             coverImage.sprite = placeholderCover;
             AudioPlayerService.Instance.Stop();
             positionSlider.value = 0f;
