@@ -19,7 +19,6 @@ import androidx.media3.exoplayer.ExoPlayer;
 import androidx.media3.session.MediaSession;
 import androidx.media3.session.MediaSessionService;
 import androidx.media3.common.MediaMetadata;
-import androidx.media.app.NotificationCompat.MediaStyle;
 
 public class MusicService extends MediaSessionService {
 
@@ -219,8 +218,7 @@ public class MusicService extends MediaSessionService {
     private Notification buildNotification() {
         Intent intent = new Intent(this, MainActivity.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_IMMUTABLE);
-        return new NotificationCompat.Builder(this, CHANNEL_ID).setSmallIcon(android.R.drawable.ic_media_play).setContentTitle(title)
-        .setContentText(artist).setVisibility(NotificationCompat.VISIBILITY_PUBLIC).setStyle(
-        new MediaStyle().setMediaSession(mediaSession.getSessionCompatToken())).setOngoing(player != null && player.isPlaying()).build();
+        return new NotificationCompat.Builder(this, CHANNEL_ID).setContentTitle("Pie Player").setContentText("Service active")
+        .setSmallIcon(android.R.drawable.ic_media_play).setContentIntent(pendingIntent).setOngoing(true).build();
     }
 }
