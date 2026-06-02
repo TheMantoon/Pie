@@ -1,5 +1,5 @@
 # Introduction
-<image src="Assets/Texture2D/Icon.png" width="300" alt="Icon" style="margin-right: 20px;"/>
+<image src="Assets/Texture2D/Icon.png" width="256" alt="Icon" style="margin-right: 20px;"/>
 
 **Pie** is an open-source audio player written in *C#*, powered by *Unity*.
 This player is gradually developing and is aimed not only at listening to music, but also at beauty and ease of use.<br>
@@ -39,14 +39,18 @@ I like developing this project and I do not think that this player should be pai
 | Ubuntu | 22.04 |
 | Android | 7.1 |
 
-# Used...
 ## Libraries
+* [Unity Engine](https://unity.com/products/unity-engine)
 * [ManagedBass](https://github.com/ManagedBass/ManagedBass)
 * [TagLibSharp](https://github.com/mono/taglib-sharp)
 * [NativeFilePicker](https://github.com/yasirkula/UnityNativeFilePicker)
 * [StandaloneFileBrowser](https://github.com/gkngkc/UnityStandaloneFileBrowser)
 * [UI Rounded Corners](https://github.com/kirevdokimov/Unity-UI-Rounded-Corners)
 * [Native Cursor](https://assetstore.unity.com/packages/tools/utilities/native-cursor-220347)
+
+## Icons
+* [Music Player Controls Icons](https://icon-icons.com/pack/music-player-controls-icons/1132)
+* [Eva Fill Icons](https://icon-icons.com/pack/eva-fill-icons/1674)
 
 # [License](LICENSE)
 **Pie** is licensed under the [MIT](https://choosealicense.com/licenses/mit). Please review the [LICENSE](LICENSE) file.
