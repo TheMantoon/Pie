@@ -12,5 +12,6 @@ namespace Pie.Backend
         public float GetPlaybackPosition();
         public float GetTrackLength();
         public bool GetState();
+        public string GetPath();
     }
 }

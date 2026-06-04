@@ -10,8 +10,7 @@
 	<uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
 	<uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK"/>
 	<uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
-	<application
-	    android:name="com.WhireDeveloper.PiePlayer.MainApplication">
+	<application>
 		<activity 
 		    android:name="com.WhireDeveloper.PiePlayer.MainActivity"
             android:configChanges="
@@ -29,6 +28,18 @@
                 android:name="unityplayer.UnityActivity"
                 android:value="true"/>
 		</activity>
+		<activity
+            android:name="com.WhireDeveloper.PiePlayer.OpenAudioActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+                <data android:mimeType="audio/*"/>
+                <data android:scheme="content"/>
+                <data android:scheme="file"/>
+            </intent-filter>
+        </activity>
 		<service
             android:name="com.WhireDeveloper.PiePlayer.MusicService"
 			android:foregroundServiceType="mediaPlayback"

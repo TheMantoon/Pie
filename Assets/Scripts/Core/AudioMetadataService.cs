@@ -19,7 +19,7 @@ namespace Pie.Core
             return Path.GetFileNameWithoutExtension(path);
         }
 
-        public static Sprite GetCover(string path, Sprite placeholder)
+        public static Texture2D GetCover(string path, Texture2D placeholder)
         {
             var file = TagLib.File.Create(path);
             if (file.Tag.Pictures != null && file.Tag.Pictures.Length > 0)
@@ -27,7 +27,7 @@ namespace Pie.Core
                 byte[] data = file.Tag.Pictures[0].Data.Data;
                 Texture2D texture = new Texture2D(2, 2);
                 texture.LoadImage(data);
-                return Sprite.Create(texture, new Rect(0, 0, texture.width, texture.height), new Vector2(0.5f, 0.5f));
+                return texture;
             }
             return placeholder;
         }

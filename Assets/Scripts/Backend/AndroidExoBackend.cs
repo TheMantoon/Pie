@@ -76,6 +76,12 @@ namespace Pie.Backend
             return serviceClass.CallStatic<bool>("getState");
         }
 
+        public string GetPath()
+        {
+            if (serviceClass == null) return null;
+            return serviceClass.CallStatic<string>("getPath");
+        }
+
         private void EnsureService()
         {
             var unity = new AndroidJavaClass("com.unity3d.player.UnityPlayer");

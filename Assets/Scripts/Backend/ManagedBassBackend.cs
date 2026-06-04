@@ -9,12 +9,14 @@ namespace Pie.Backend
         private int stream;
         private bool isLoop;
         private float volume = 1f;
+        private string currentPath;
 
         public ManagedBassBackend() => Bass.Init(-1, 48000, DeviceInitFlags.Default);
 
         public void Load(string path)
         {
             Stop();
+            currentPath = path;
             stream = Bass.CreateStream(path, 0);
             Bass.ChannelSetAttribute(stream, ChannelAttribute.Volume, volume);
             Bass.ChannelFlags(stream, isLoop ? BassFlags.Loop : BassFlags.Default, BassFlags.Loop);
@@ -35,11 +37,10 @@ namespace Pie.Backend
 
         public void Stop()
         {
-            if (stream != 0)
-            {
-                Bass.StreamFree(stream);
-                stream = 0;
-            }
+            if (stream == 0) return;
+            Bass.StreamFree(stream);
+            stream = 0;
+            currentPath = null;
         }
 
         public void SetVolume(float v)
@@ -83,6 +84,11 @@ namespace Pie.Backend
         {
             if (stream == 0) return false;
             return Bass.ChannelIsActive(stream) == PlaybackState.Playing;
+        }
+
+        public string GetPath()
+        {
+            return currentPath;
         }
 
         ~ManagedBassBackend()

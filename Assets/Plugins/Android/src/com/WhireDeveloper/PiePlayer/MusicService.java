@@ -3,15 +3,14 @@ package com.WhireDeveloper.PiePlayer;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
-import android.graphics.BitmapFactory;
 import android.media.MediaMetadataRetriever;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.os.Build;
 import androidx.core.app.NotificationCompat;
 import androidx.annotation.Nullable;
 import androidx.media3.common.MediaItem;
@@ -31,6 +30,9 @@ public class MusicService extends MediaSessionService {
     private static final Handler mainHandler = new Handler(Looper.getMainLooper());
     private static final String CHANNEL_ID = "PiePlayerChannel";
     private static final int NOTIFICATION_ID = 1;
+    public static final String ACTION_PLAY = "com.WhireDeveloper.PiePlayer.PLAY";
+    public static final String EXTRA_URI = "audio_uri";
+    private static String currentPath;
 
     private static void runOnMainThread(Runnable action) {
         mainHandler.post(action);
@@ -70,6 +72,20 @@ public class MusicService extends MediaSessionService {
         return mediaSession;
     }
 
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        if (intent != null && ACTION_PLAY.equals(intent.getAction())) {
+            String uriString = intent.getStringExtra(EXTRA_URI);
+            if (uriString != null) {
+                Uri uri = Uri.parse(uriString);
+                String path = Uri.decode(uri.getPath());
+                path = path.replace("/external_files/", "/storage/emulated/0/");
+                play(path);
+            }
+        }
+        return START_STICKY;
+    }
+
     public static void startService(Context context) {
         Intent intent = new Intent(context, MusicService.class);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -83,7 +99,7 @@ public class MusicService extends MediaSessionService {
         @Override
         public void run() {
             ExoPlayer p = player;
-            if (p!= null) {
+            if (p != null) {
                 long duration = p.getDuration();
                 cachedDuration = duration > 0 ? duration / 1000f : 0f;
                 cachedPosition = duration > 0 ? (float) p.getCurrentPosition() / duration : 0f;
@@ -103,6 +119,7 @@ public class MusicService extends MediaSessionService {
             p.setMediaItem(mediaItem);
             p.prepare();
             p.play();
+            currentPath = path;
         });
     }
 
@@ -131,6 +148,7 @@ public class MusicService extends MediaSessionService {
                 p.stop();
                 p.clearMediaItems();
             }
+            currentPath = null;
         });
     }
 
@@ -179,6 +197,10 @@ public class MusicService extends MediaSessionService {
         return cachedPlaying;
     }
 
+    public static String getPath() {
+        return currentPath;
+    }
+
     private static MediaItem createMediaItem(String path) {
         String title = null;
         String artist = null;
@@ -219,6 +241,6 @@ public class MusicService extends MediaSessionService {
         Intent intent = new Intent(this, MainActivity.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_IMMUTABLE);
         return new NotificationCompat.Builder(this, CHANNEL_ID).setContentTitle("Pie Player").setContentText("Service active")
-        .setSmallIcon(android.R.drawable.ic_media_play).setContentIntent(pendingIntent).setOngoing(true).build();
+                .setSmallIcon(android.R.drawable.ic_media_play).setContentIntent(pendingIntent).setOngoing(true).build();
     }
 }

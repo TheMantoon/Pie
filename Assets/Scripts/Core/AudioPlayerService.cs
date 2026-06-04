@@ -38,5 +38,6 @@ namespace Pie.Core
         public float GetPlaybackPosition() => backend.GetPlaybackPosition();
         public float GetTrackLength() => backend.GetTrackLength();
         public bool GetState() => backend.GetState();
+        public string GetPath() => backend.GetPath();
     }
 }

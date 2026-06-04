@@ -6,9 +6,9 @@ namespace Pie.UI
     [RequireComponent(typeof(CanvasScaler))]
     public class AutoCanvasScaler : MonoBehaviour
     {
+        [SerializeField] private bool inverted = false;
         private Vector2 referenceResolution = new Vector2(720, 1280);
         private CanvasScaler scaler;
-        [SerializeField] private bool inverted = false;
 
         private void Awake()
         {

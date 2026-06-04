@@ -1,19 +1,58 @@
 using UnityEngine;
 using UnityEngine.UI;
 using Pie.Core;
+using System.IO;
 
 namespace Pie.UI
 {
     public class PlayerUIController : MonoBehaviour
     {
         public Text titleText, performersText, timeText, volumeText;
-        public Image coverImage, playImage;
-        public Sprite placeholderCover, resumeSprite, pauseSprite;
+        public RawImage coverImage, playImage;
+        public Texture2D placeholderCover, resumeSprite, pauseSprite;
         public Slider positionSlider;
         private bool isDragging;
         private float timer = 0.0f;
+        private bool isLoaded = false;
 
-        private void Start() => UpdateVolumeText(1f);
+        private void Start()
+        {
+            Screen.sleepTimeout = SleepTimeout.NeverSleep;
+            Application.targetFrameRate = (int)Screen.currentResolution.refreshRateRatio.value;
+#if UNITY_STANDALONE_WIN || UNITY_EDITOR_WIN
+            DragDropHandler dragDropHandler = DragDropHandler.Instance;
+            dragDropHandler.fileDropEvent += delegate (string[] paths)
+            {
+                for (int i = 0; i < paths.Length; ++i)
+                {
+                    if(IsValidExtension(Path.GetExtension(paths[i])))
+                    {
+                        titleText.text = AudioMetadataService.GetTitle(paths[i]);
+                        performersText.text = AudioMetadataService.GetPerformers(paths[i]);
+                        coverImage.texture = AudioMetadataService.GetCover(paths[i], placeholderCover);
+                        AudioPlayerService.Instance.Load(paths[i]);
+                        AudioPlayerService.Instance.Play();
+                        positionSlider.value = 0f;
+                        positionSlider.interactable = true;
+                        playImage.texture = pauseSprite;
+                    }
+                }
+            };
+#endif
+        }
+        
+        private bool IsValidExtension(string ext)
+        {
+            if (string.IsNullOrEmpty(ext)) return false;
+            ext = ext.TrimStart('.').ToLower();
+            string[] validExts = new[] { "mp3", "mp2", "mp1", "ogg", "flac", "aif", "aiff", "wav", "wma", "mod" };
+            if (validExts.Length == 1 && validExts[0] == "*") return true;
+            foreach (string valid in validExts)
+            {
+                if (ext == valid.ToLower()) return true;
+            }
+            return false;
+        }
 
         private void Update()
         {
@@ -24,8 +63,16 @@ namespace Pie.UI
                 positionSlider.value = progress;
                 UpdateTimeText(progress);
                 timer = 0.0f;
-                if (AudioPlayerService.Instance.GetState()) playImage.sprite = pauseSprite;
-                else playImage.sprite = resumeSprite;
+                if (AudioPlayerService.Instance.GetState()) playImage.texture = pauseSprite;
+                else playImage.texture = resumeSprite;
+                string path = AudioPlayerService.Instance.GetPath();
+                if (!isLoaded && path != null)
+                {
+                    titleText.text = AudioMetadataService.GetTitle(path);
+                    performersText.text = AudioMetadataService.GetPerformers(path);
+                    coverImage.texture = AudioMetadataService.GetCover(path, placeholderCover);
+                    isLoaded = true;
+                }
             }
         }
 
@@ -36,12 +83,13 @@ namespace Pie.UI
                 if (string.IsNullOrEmpty(path)) return;
                 titleText.text = AudioMetadataService.GetTitle(path);
                 performersText.text = AudioMetadataService.GetPerformers(path);
-                coverImage.sprite = AudioMetadataService.GetCover(path, placeholderCover);
+                coverImage.texture = AudioMetadataService.GetCover(path, placeholderCover);
                 AudioPlayerService.Instance.Load(path);
                 AudioPlayerService.Instance.Play();
                 positionSlider.value = 0f;
                 positionSlider.interactable = true;
-                playImage.sprite = pauseSprite;
+                playImage.texture = pauseSprite;
+                isLoaded = true;
             });
         }
 
@@ -50,13 +98,13 @@ namespace Pie.UI
             AudioPlayerService.Instance.Play();
             positionSlider.value = 0f;
             positionSlider.interactable = true;
-            playImage.sprite = pauseSprite;
+            playImage.texture = pauseSprite;
         }
 
         public void Pause()
         {
-            if (!AudioPlayerService.Instance.GetState()) playImage.sprite = pauseSprite;
-            else playImage.sprite = resumeSprite;
+            if (!AudioPlayerService.Instance.GetState()) playImage.texture = pauseSprite;
+            else playImage.texture = resumeSprite;
             AudioPlayerService.Instance.Pause();
         }
 
@@ -64,12 +112,13 @@ namespace Pie.UI
         {
             titleText.text = "Select audio";
             performersText.text = string.Empty;
-            coverImage.sprite = placeholderCover;
+            coverImage.texture = placeholderCover;
             AudioPlayerService.Instance.Stop();
             positionSlider.value = 0f;
             positionSlider.interactable = false;
             timeText.text = "00:00/00:00";
-            playImage.sprite = resumeSprite;
+            playImage.texture = resumeSprite;
+            isLoaded = false;
         }
 
         public void BeginDrag() => isDragging = true;
