@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.UI;
 using Pie.Core;
 using System.IO;
+using System;
 
 namespace Pie.UI
 {
@@ -19,6 +20,21 @@ namespace Pie.UI
         {
             Screen.sleepTimeout = SleepTimeout.NeverSleep;
             Application.targetFrameRate = (int)Screen.currentResolution.refreshRateRatio.value;
+#if UNITY_STANDALONE && !UNITY_EDITOR
+            string[] args = Environment.GetCommandLineArgs();
+            if (args.Length > 1)
+            {
+                string audioFilePath = args[1];
+                titleText.text = AudioMetadataService.GetTitle(audioFilePath);
+                performersText.text = AudioMetadataService.GetPerformers(audioFilePath);
+                coverImage.texture = AudioMetadataService.GetCover(audioFilePath, placeholderCover);
+                AudioPlayerService.Instance.Load(audioFilePath);
+                AudioPlayerService.Instance.Play();
+                positionSlider.value = 0f;
+                positionSlider.interactable = true;
+                playImage.texture = pauseSprite;
+            }
+#endif
 #if UNITY_STANDALONE_WIN || UNITY_EDITOR_WIN
             DragDropHandler dragDropHandler = DragDropHandler.Instance;
             dragDropHandler.fileDropEvent += delegate (string[] paths)
@@ -66,11 +82,12 @@ namespace Pie.UI
                 if (AudioPlayerService.Instance.GetState()) playImage.texture = pauseSprite;
                 else playImage.texture = resumeSprite;
                 string path = AudioPlayerService.Instance.GetPath();
-                if (!isLoaded && path != null)
+                if ((!isLoaded && path != null) || (isLoaded && titleText.text != AudioMetadataService.GetTitle(path)))
                 {
                     titleText.text = AudioMetadataService.GetTitle(path);
                     performersText.text = AudioMetadataService.GetPerformers(path);
                     coverImage.texture = AudioMetadataService.GetCover(path, placeholderCover);
+                    positionSlider.interactable = true;
                     isLoaded = true;
                 }
             }
