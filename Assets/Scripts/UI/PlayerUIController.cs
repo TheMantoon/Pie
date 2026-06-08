@@ -3,6 +3,9 @@ using UnityEngine.UI;
 using Pie.Core;
 using System.IO;
 using System;
+using System.Collections.Generic;
+using System.Net.Sockets;
+using System.Net;
 
 namespace Pie.UI
 {
@@ -15,25 +18,16 @@ namespace Pie.UI
         private bool isDragging;
         private float timer = 0.0f;
         private bool isLoaded = false;
+        private string[] validExts = new[] { "mp3", "mp2", "mp1", "ogg", "flac", "aif", "aiff", "wav", "wma", "mod" };
 
         private void Start()
         {
             Screen.sleepTimeout = SleepTimeout.NeverSleep;
             Application.targetFrameRate = (int)Screen.currentResolution.refreshRateRatio.value;
+            List<string> music = new List<string>();
+            music = GetAudioFiles(Environment.GetFolderPath(Environment.SpecialFolder.MyMusic));
 #if UNITY_STANDALONE && !UNITY_EDITOR
-            string[] args = Environment.GetCommandLineArgs();
-            if (args.Length > 1)
-            {
-                string audioFilePath = args[1];
-                titleText.text = AudioMetadataService.GetTitle(audioFilePath);
-                performersText.text = AudioMetadataService.GetPerformers(audioFilePath);
-                coverImage.texture = AudioMetadataService.GetCover(audioFilePath, placeholderCover);
-                AudioPlayerService.Instance.Load(audioFilePath);
-                AudioPlayerService.Instance.Play();
-                positionSlider.value = 0f;
-                positionSlider.interactable = true;
-                playImage.texture = pauseSprite;
-            }
+            if (!string.IsNullOrEmpty(SingleInstanceManager.StartupFile)) OpenAudio(SingleInstanceManager.StartupFile);
 #endif
 #if UNITY_STANDALONE_WIN || UNITY_EDITOR_WIN
             DragDropHandler dragDropHandler = DragDropHandler.Instance;
@@ -41,17 +35,7 @@ namespace Pie.UI
             {
                 for (int i = 0; i < paths.Length; ++i)
                 {
-                    if(IsValidExtension(Path.GetExtension(paths[i])))
-                    {
-                        titleText.text = AudioMetadataService.GetTitle(paths[i]);
-                        performersText.text = AudioMetadataService.GetPerformers(paths[i]);
-                        coverImage.texture = AudioMetadataService.GetCover(paths[i], placeholderCover);
-                        AudioPlayerService.Instance.Load(paths[i]);
-                        AudioPlayerService.Instance.Play();
-                        positionSlider.value = 0f;
-                        positionSlider.interactable = true;
-                        playImage.texture = pauseSprite;
-                    }
+                    if(IsValidExtension(Path.GetExtension(paths[i]))) OpenAudio(paths[i]);
                 }
             };
 #endif
@@ -61,17 +45,16 @@ namespace Pie.UI
         {
             if (string.IsNullOrEmpty(ext)) return false;
             ext = ext.TrimStart('.').ToLower();
-            string[] validExts = new[] { "mp3", "mp2", "mp1", "ogg", "flac", "aif", "aiff", "wav", "wma", "mod" };
             if (validExts.Length == 1 && validExts[0] == "*") return true;
-            foreach (string valid in validExts)
-            {
-                if (ext == valid.ToLower()) return true;
-            }
+            foreach (string valid in validExts) { if (ext == valid.ToLower()) return true; }
             return false;
         }
 
         private void Update()
         {
+#if UNITY_STANDALONE || UNITY_EDITOR
+            while (SingleInstanceManager.TryGetNextFile(out string path)) OpenAudio(path);
+#endif
             timer += Time.deltaTime;
             if (timer >= 0.2f && !isDragging)
             {
@@ -93,21 +76,32 @@ namespace Pie.UI
             }
         }
 
-        public void OpenFile()
+        public List<string> GetAudioFiles(string root)
         {
-            FilePickerService.Instance.PickAudioFile((path) =>
+            List<string> result = new();
+            if (!Directory.Exists(root)) return result;
+            foreach (var ext in validExts)
             {
-                if (string.IsNullOrEmpty(path)) return;
-                titleText.text = AudioMetadataService.GetTitle(path);
-                performersText.text = AudioMetadataService.GetPerformers(path);
-                coverImage.texture = AudioMetadataService.GetCover(path, placeholderCover);
-                AudioPlayerService.Instance.Load(path);
-                AudioPlayerService.Instance.Play();
-                positionSlider.value = 0f;
-                positionSlider.interactable = true;
-                playImage.texture = pauseSprite;
-                isLoaded = true;
-            });
+                try { result.AddRange(Directory.GetFiles(root, "*." + ext, SearchOption.AllDirectories)); }
+                catch { }
+            }
+            return result;
+        }
+
+        public void OpenFile() => FilePickerService.Instance.PickAudioFile((path) => { OpenAudio(path); });
+
+        private void OpenAudio(string path)
+        {
+            if (string.IsNullOrEmpty(path)) return;
+            titleText.text = AudioMetadataService.GetTitle(path);
+            performersText.text = AudioMetadataService.GetPerformers(path);
+            coverImage.texture = AudioMetadataService.GetCover(path, placeholderCover);
+            AudioPlayerService.Instance.Load(path);
+            AudioPlayerService.Instance.Play();
+            positionSlider.value = 0f;
+            positionSlider.interactable = true;
+            playImage.texture = pauseSprite;
+            isLoaded = true;
         }
 
         public void Play()
@@ -115,7 +109,7 @@ namespace Pie.UI
             AudioPlayerService.Instance.Play();
             positionSlider.value = 0f;
             positionSlider.interactable = true;
-            playImage.texture = pauseSprite;
+            if (isLoaded) playImage.texture = pauseSprite;
         }
 
         public void Pause()
@@ -173,5 +167,9 @@ namespace Pie.UI
             int sec = Mathf.FloorToInt(seconds % 60f);
             return $"{min:00}:{sec:00}";
         }
+
+#if UNITY_STANDALONE || UNITY_EDITOR
+        private void OnApplicationQuit() => SingleInstanceManager.Shutdown();
+#endif
     }
 }
