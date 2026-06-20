@@ -39,7 +39,7 @@ I like developing this project and I do not think that this player should be pai
 | Ubuntu | 22.04 |
 | Android | 7.1 |
 
-## Libraries
+## Frameworks and Libraries
 * [Unity Engine](https://unity.com/products/unity-engine)
 * [ManagedBass](https://github.com/ManagedBass/ManagedBass)
 * [TagLibSharp](https://github.com/mono/taglib-sharp)
