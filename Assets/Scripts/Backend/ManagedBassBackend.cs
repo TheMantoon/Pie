@@ -1,4 +1,5 @@
 #if UNITY_STANDALONE || UNITY_EDITOR
+using System;
 using ManagedBass;
 using UnityEditor;
 
@@ -11,13 +12,14 @@ namespace Pie.Backend
         private float volume = 1f;
         private string currentPath;
 
-        public ManagedBassBackend() => Bass.Init(-1, 48000, DeviceInitFlags.Default);
+        public ManagedBassBackend() => Bass.Init();
 
         public void Load(string path)
         {
             Stop();
             currentPath = path;
-            stream = Bass.CreateStream(path, 0);
+            try { stream = Bass.CreateStream(path); }
+            catch (Exception e) { UnityEngine.Debug.LogError(e); }
             Bass.ChannelSetAttribute(stream, ChannelAttribute.Volume, volume);
             Bass.ChannelFlags(stream, isLoop ? BassFlags.Loop : BassFlags.Default, BassFlags.Loop);
             Play();
