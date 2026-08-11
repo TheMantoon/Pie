@@ -28,12 +28,6 @@
                 <data android:scheme="file"/>
             </intent-filter>
         </activity>
-		<service
-            android:name="com.WhireDeveloper.PiePlayer.MusicService" android:foregroundServiceType="mediaPlayback"
-            android:exported="false">
-		    <intent-filter>
-                <action android:name="androidx.media3.session.MediaSessionService"/>
-            </intent-filter>
-	    </service>
+		<service android:name="com.WhireDeveloper.PiePlayer.MusicService" android:exported="false" android:foregroundServiceType="mediaPlayback" />
 	</application>
 </manifest>

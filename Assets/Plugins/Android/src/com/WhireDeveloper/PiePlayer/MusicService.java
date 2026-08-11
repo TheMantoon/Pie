@@ -1,246 +1,83 @@
 package com.WhireDeveloper.PiePlayer;
 
-import android.content.Context;
-import android.content.Intent;
-import android.net.Uri;
-import android.os.Handler;
-import android.os.Looper;
-import android.media.MediaMetadataRetriever;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.app.Service;
+import android.content.Context;
+import android.content.Intent;
 import android.os.Build;
-import androidx.core.app.NotificationCompat;
-import androidx.annotation.Nullable;
-import androidx.media3.common.MediaItem;
-import androidx.media3.exoplayer.ExoPlayer;
-import androidx.media3.session.MediaSession;
-import androidx.media3.session.MediaSessionService;
-import androidx.media3.common.MediaMetadata;
+import android.os.IBinder;
 
-public class MusicService extends MediaSessionService {
+public class MusicService extends Service {
+    private static final String CHANNEL_ID = "pie_player_playback";
+    private static final int NOTIFICATION_ID = 1001;
+    public static final String ACTION_START = "com.WhireDeveloper.PiePlayer.START_MUSIC_SERVICE";
+    public static final String ACTION_STOP = "com.WhireDeveloper.PiePlayer.STOP_MUSIC_SERVICE";
 
-    private static MusicService instance;
-    private static ExoPlayer player;
-    private MediaSession mediaSession;
-    private static volatile float cachedPosition = 0f;
-    private static volatile float cachedDuration = 0f;
-    private static volatile boolean cachedPlaying = false;
-    private static final Handler mainHandler = new Handler(Looper.getMainLooper());
-    private static final String CHANNEL_ID = "PiePlayerChannel";
-    private static final int NOTIFICATION_ID = 1;
-    public static final String ACTION_PLAY = "com.WhireDeveloper.PiePlayer.PLAY";
-    public static final String EXTRA_URI = "audio_uri";
-    private static String currentPath;
+    public static void start(Context context) {
+        Intent intent = new Intent(context, MusicService.class);
+        intent.setAction(ACTION_START);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) context.startForegroundService(intent);
+        else context.startService(intent);
+    }
 
-    private static void runOnMainThread(Runnable action) {
-        mainHandler.post(action);
+    public static void stop(Context context) {
+        Intent intent = new Intent(context, MusicService.class);
+        intent.setAction(ACTION_STOP);
+        context.startService(intent);
     }
 
     @Override
     public void onCreate() {
         super.onCreate();
-        instance = this;
         createNotificationChannel();
-        if (player == null) {
-            player = new ExoPlayer.Builder(this).build();
-            mainHandler.post(stateUpdater);
-        }
-        mediaSession = new MediaSession.Builder(this, player).build();
-        startForeground(NOTIFICATION_ID, buildNotification());
-    }
-
-    @Override
-    public void onDestroy() {
-        mainHandler.removeCallbacks(stateUpdater);
-        if (mediaSession != null) {
-            mediaSession.release();
-            mediaSession = null;
-        }
-        if (player != null) {
-            player.release();
-            player = null;
-        }
-        instance = null;
-        super.onDestroy();
-    }
-
-    @Nullable
-    @Override
-    public MediaSession onGetSession(androidx.media3.session.MediaSession.ControllerInfo controllerInfo) {
-        return mediaSession;
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        if (intent != null && ACTION_PLAY.equals(intent.getAction())) {
-            String uriString = intent.getStringExtra(EXTRA_URI);
-            if (uriString != null) {
-                Uri uri = Uri.parse(uriString);
-                String path = Uri.decode(uri.getPath());
-                path = path.replace("/external_files/", "/storage/emulated/0/");
-                play(path);
-            }
+        if (intent != null && ACTION_STOP.equals(intent.getAction())) {
+            stopForeground(true);
+            stopSelf();
+            return START_NOT_STICKY;
         }
+        startForeground(NOTIFICATION_ID, createNotification());
         return START_STICKY;
     }
 
-    public static void startService(Context context) {
-        Intent intent = new Intent(context, MusicService.class);
+    private Notification createNotification() {
+        Intent launchIntent = new Intent(this, MainActivity.class);
+        launchIntent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, launchIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            context.startForegroundService(intent);
-        } else {
-            context.startService(intent);
+            return new Notification.Builder(this, CHANNEL_ID).setContentTitle("Pie Player").setContentText("Audio playing")
+                .setSmallIcon(getApplicationInfo().icon).setContentIntent(pendingIntent).setOngoing(true)
+                .setCategory(Notification.CATEGORY_TRANSPORT).build();
         }
-    }
 
-    private static final Runnable stateUpdater = new Runnable() {
-        @Override
-        public void run() {
-            ExoPlayer p = player;
-            if (p != null) {
-                long duration = p.getDuration();
-                cachedDuration = duration > 0 ? duration / 1000f : 0f;
-                cachedPosition = duration > 0 ? (float) p.getCurrentPosition() / duration : 0f;
-                cachedPlaying = p.isPlaying();
-            }
-            mainHandler.postDelayed(this, 100);
-        }
-    };
-
-    public static void play(String path) {
-        runOnMainThread(() -> {
-            ExoPlayer p = player;
-            if (p == null) {
-                return;
-            }
-            MediaItem mediaItem = createMediaItem(path);
-            p.setMediaItem(mediaItem);
-            p.prepare();
-            p.play();
-            currentPath = path;
-        });
-    }
-
-    public static void pause() {
-        runOnMainThread(() -> {
-            ExoPlayer p = player;
-            if (p != null) {
-                p.pause();
-            }
-        });
-    }
-
-    public static void resume() {
-        runOnMainThread(() -> {
-            ExoPlayer p = player;
-            if (p != null) {
-                p.play();
-            }
-        });
-    }
-
-    public static void stop() {
-        runOnMainThread(() -> {
-            ExoPlayer p = player;
-            if (p != null) {
-                p.stop();
-                p.clearMediaItems();
-            }
-            currentPath = null;
-        });
-    }
-
-    public static void setVolume(float volume) {
-        runOnMainThread(() -> {
-            ExoPlayer p = player;
-            if (p != null) {
-                p.setVolume(volume);
-            }
-        });
-    }
-
-    public static void setLoop(boolean loop) {
-        runOnMainThread(() -> {
-            ExoPlayer p = player;
-            if (p != null) {
-                p.setRepeatMode(loop ? ExoPlayer.REPEAT_MODE_ONE : ExoPlayer.REPEAT_MODE_OFF);
-            }
-        });
-    }
-
-    public static void seek(float normalized) {
-
-        runOnMainThread(() -> {
-            ExoPlayer p = player;
-            if (p == null) {
-                return;
-            }
-            long duration = p.getDuration();
-            if (duration <= 0) {
-                return;
-            }
-            p.seekTo((long) (duration * normalized));
-        });
-    }
-
-    public static float getPosition() {
-        return cachedPosition;
-    }
-
-    public static float getDuration() {
-        return cachedDuration;
-    }
-
-    public static boolean getState() {
-        return cachedPlaying;
-    }
-
-    public static String getPath() {
-        return currentPath;
-    }
-
-    private static MediaItem createMediaItem(String path) {
-        String title = null;
-        String artist = null;
-        byte[] artwork = null;
-        try {
-            MediaMetadataRetriever retriever = new MediaMetadataRetriever();
-            retriever.setDataSource(path);
-            title = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE);
-            artist = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST);
-            artwork = retriever.getEmbeddedPicture();
-            retriever.release();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        if (title == null || title.isEmpty()) {
-            java.io.File file = new java.io.File(path);
-            title = file.getName();
-        }
-        MediaMetadata.Builder metadata = new MediaMetadata.Builder().setTitle(title);
-        if (artist != null) {
-            metadata.setArtist(artist);
-        }
-        if (artwork != null) {
-            metadata.setArtworkData(artwork, MediaMetadata.PICTURE_TYPE_FRONT_COVER);
-        }
-        return new MediaItem.Builder().setUri(Uri.parse(path)).setMediaMetadata(metadata.build()).build();
+        return new Notification.Builder(this)
+            .setContentTitle("Pie Player").setContentText("Audio playing").setSmallIcon(getApplicationInfo().icon)
+            .setContentIntent(pendingIntent).setOngoing(true).setCategory(Notification.CATEGORY_TRANSPORT).build();
     }
 
     private void createNotificationChannel() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationChannel channel = new NotificationChannel(CHANNEL_ID, "Music Service", NotificationManager.IMPORTANCE_LOW);
-            NotificationManager manager = getSystemService(NotificationManager.class);
-            manager.createNotificationChannel(channel);
-        }
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return;
+        NotificationChannel channel = new NotificationChannel(CHANNEL_ID, "Playing", NotificationManager.IMPORTANCE_LOW);
+        channel.setDescription("Pie Player foreground playing");
+        channel.setShowBadge(false);
+        NotificationManager manager = getSystemService(NotificationManager.class);
+        if (manager != null) manager.createNotificationChannel(channel);
     }
 
-    private Notification buildNotification() {
-        Intent intent = new Intent(this, MainActivity.class);
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_IMMUTABLE);
-        return new NotificationCompat.Builder(this, CHANNEL_ID).setContentTitle("Pie Player").setContentText("Service active")
-                .setSmallIcon(android.R.drawable.ic_media_play).setContentIntent(pendingIntent).setOngoing(true).build();
+    @Override
+    public void onDestroy() {
+        stopForeground(true);
+        super.onDestroy();
+    }
+
+    @Override
+    public IBinder onBind(Intent intent) {
+        return null;
     }
 }

@@ -1,4 +1,3 @@
-#if UNITY_STANDALONE || UNITY_EDITOR
 using System;
 using ManagedBass;
 using UnityEditor;
@@ -112,5 +111,4 @@ public static class BassEditorCleanup
         if (state == PlayModeStateChange.ExitingPlayMode) Bass.Free();
     }
 }
-#endif
 #endif

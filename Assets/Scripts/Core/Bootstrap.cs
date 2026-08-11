@@ -2,11 +2,13 @@ using UnityEngine;
 
 namespace Pie.Core
 {
-    public class FPSCapper : MonoBehaviour
+    public class Bootstrap
     {
-        private void Awake()
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSplashScreen)]
+        private static void Initialization()
         {
             Screen.sleepTimeout = SleepTimeout.NeverSleep;
+            QualitySettings.vSyncCount = 0;
             Application.targetFrameRate = (int)Screen.currentResolution.refreshRateRatio.value;
         }
     }
