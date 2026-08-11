@@ -37,7 +37,7 @@ I like developing this project and I do not think that this player should be pai
 | :------- | :----------------: |
 | Windows | 10 |
 | Ubuntu | 22.04 |
-| Android | 7.1 |
+| Android | 8 |
 
 ## Frameworks and Libraries
 * [Unity Engine](https://unity.com/products/unity-engine)
